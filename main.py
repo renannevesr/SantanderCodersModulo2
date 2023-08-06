@@ -9,15 +9,25 @@ def main():
 """
         print(menu_str)
 
-        option = input("Escolha uma opção: ")
-        if option == '1':
+        opcao = input("Escolha uma opção: ")
+        if opcao == '1':
             print("opção 1")
-        elif option == '2':
+        elif opcao == '2':
             print("opção 2")
-        elif option == '3':
+        elif opcao == '3':
             print("Saindo...")
             break
 
+class Clientes:
+    def __init__(self, cpf, nome, data_nascimento):
+        self.cpf = cpf
+        self.nome = nome
+        self.data_nascimento = data_nascimento
+    
+
+class MedicamentosFitoterapicos():
+    def __init__():
+        pass
 
 
 if __name__ == "__main__":
