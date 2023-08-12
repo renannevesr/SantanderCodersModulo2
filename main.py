@@ -1,12 +1,23 @@
+from datetime import datetime
+from datetime import date
+
 clientes = []
+medicamentos = []
+
+
 class Clientes:
-    def __init__(self, cpf, nome, data_nascimento):
-        self.cpf = cpf
-        self.nome = nome
-        self.data_nascimento = data_nascimento
+    def __init__(self, cpf: str, nome: str, data_nascimento: date):
+        self._cpf: str = cpf
+        self.nome: str = nome
+        self.data_nascimento: date = data_nascimento
+    
+    @property
+    def cpf(self) -> str:
+        return self._cpf
 
 
-def adicionar_cliente():
+
+def adicionar_cliente() -> None:
     cpf = input("Digite o CPF do cliente: ")
     nome = input("Digite o Nome do cliente: ")
     data_nascimento = input("Digite a Data de Nascimento do cliente: ")
@@ -14,26 +25,173 @@ def adicionar_cliente():
     novo_cliente = Clientes(cpf, nome, data_nascimento)
     clientes.append(novo_cliente)
 
-def busca_cliente_cpf():
+def busca_cliente_cpf() -> Clientes:
     cpf = input("Digite o CPF do cliente: ")
     for cliente in clientes:
         if cliente.cpf == cpf:
             print(cliente.nome)
             return cliente
-class MedicamentosFitoterapicos():
-    def __init__(self, nome, composto_principal, laboratorio, descricao):
-        self.nome = nome
-        self.composto_principal = composto_principal
-        self.laboratorio = laboratorio
-        self.descricao = descricao
-
-# class MedicamentosQuimioterapicos(MedicamentosFitoterapicos):
-#     def __init__(self, nome, composto_principal, laboratorio, descricao):
-#         MedicamentosFitoterapicos.__init__(self, nome = nome, composto_principal = composto_principal, laboratorio = laboratorio, descricao = descricao, necessita_receita)
-     #   self.necessita_receita = necessita_receita
 
 
 
+
+
+class Laboratorios():
+    def __init__(self, nome: str, endereco: str, telefone: str, cidade: str, estado: str):
+        self.nome: str = nome
+        self.endereco: str = endereco
+        self.telefone: str = telefone
+        self.cidade: str = cidade
+        self.estado: str = estado
+
+
+class Medicamentos():
+    def __init__(self, nome: str, composto_principal: str,
+                  laboratorio: Laboratorios, descricao: str, valor: float):
+        self.nome: str = nome
+        self.composto_principal: str = composto_principal
+        self.laboratorio: Laboratorios = laboratorio
+        self.descricao: str = descricao
+        self.valor: float = valor
+    
+        
+class MedicamentosFitoterapicos(Medicamentos):
+    def __init__(self, nome: str, composto_principal: str,
+                  laboratorio: Laboratorios, descricao: str, valor: float):
+        super().__init__(nome, composto_principal, laboratorio, descricao, valor)
+
+
+class MedicamentosQuimioterapicos(Medicamentos):
+    def __init__(self, nome: str, composto_principal: str,
+                  laboratorio: Laboratorios, descricao: str, valor: float, receita: bool):
+        super().__init__(nome, composto_principal, laboratorio, descricao, valor )
+        self.receita: bool = receita
+
+
+
+def adicionar_medicamento() -> None:
+
+        nome = input("Digite o Nome do Medicamento: ")
+        composto_principal = input("Digite o Composto Principal do Medicamento: ")
+        laboratorio = input("Digite o Laboratório do Medicamento: ")
+        descricao = input("Digite a Descrição do Medicamento: ")
+        valor = float(input("Digite o valor do Medicamento: "))
+        tipo = input("Esse Medicamento é Fitoterápico? (SIM/NÃO) ").upper()
+        #Fitoterápico Não Precisa de Receita
+        
+        controle_tipo = True
+        while controle_tipo:
+            if tipo == "SIM":
+                novo_medicamento = MedicamentosFitoterapicos(nome, composto_principal, laboratorio, descricao, valor)
+                medicamentos.append(novo_medicamento)
+                controle_tipo = False
+            
+            elif tipo == "NÃO":
+                receita = input("Esse Medicamento exige Receita? (SIM/NÃO )").upper()
+
+                controle_receita = True
+                while controle_receita:
+                    if receita == 'SIM':
+                        novo_medicamento = MedicamentosQuimioterapicos(nome, composto_principal, laboratorio, descricao, valor, True)
+                        medicamentos.append(novo_medicamento)
+                        controle_receita = False
+
+                    elif receita == 'NÃO':
+                        novo_medicamento = MedicamentosQuimioterapicos(nome, composto_principal, laboratorio, descricao, valor, False)
+                        medicamentos.append(novo_medicamento)
+                        controle_receita = False
+                    else:
+                        print("Opção Inválida")        
+                controle_tipo = False 
+            else:
+                print("Opção Inválida")
+
+
+def busca_medicamentos_nome() -> Medicamentos:
+    nome = input("Digite o Nome do Medicamento: ")
+    for medicamento in medicamentos:
+        if medicamento.nome == nome:
+            print(medicamento.nome)
+            return medicamento
+
+def busca_medicamentos_laboratorio() -> Medicamentos:
+    lista_medicamentos_laboratorio = []
+    laboratorio = input("Digite o Laboratório do Medicamento: ")
+    for medicamento in medicamentos:
+        if medicamento.laboratorio == laboratorio:
+            lista_medicamentos_laboratorio.append(medicamento)
+            print(medicamento.laboratorio)
+            return lista_medicamentos_laboratorio
+        
+def busca_medicamentos_descricao() -> Medicamentos:
+    lista_medicamentos_descricao = []
+    descricao = input("Digite a Descrição do Medicamento: ")
+    for medicamento in medicamentos:
+        if descricao in medicamento.descricao:
+            lista_medicamentos_descricao.append(medicamento)
+            print(medicamento.laboratorio)
+            return lista_medicamentos_descricao
+        
+
+
+class Relatorios():
+    pass
+
+
+class Vendas():
+    def __init__(self, cliente: Clientes, produto_vendido: Medicamentos, qtd: int):
+        self._data: datetime = datetime.now()
+        self._cliente: Clientes = cliente
+        self._produto_vendido: Medicamentos = produto_vendido
+        self._qtd: int = qtd
+        self._valor_total: float = _calculo_valor_total(self) # CALCULAR VALOR TOTAL
+
+# FUNÇÃO _calculo_valor_total FUNCIONA CORRETAMENTE (TESTEI EM OUTRO ARQUIVO)
+# PORÉM NÃO CONSEGUI ENCAIXÁ-LA NO PROJETO, POIS O PROJETO DA DESCONTO NO FINAL DA VENDA
+# E A CLASSE VENDA ESTÁ INCLUINDO SOMENTE 1 PRODUTO E NÃO A VENDA COMPLETA 
+# VENDA COMPLETA = TODOS OS PRODUTOS DAQUELA VENDA
+# FUNÇÃO _calculo_valor_total ESTÁ CALCULANDO O VALOR COM DESCONTO
+
+    def _calculo_valor_total(self):
+        idade = self._data - self._cliente.data_nascimento
+        # COMO TRANSFORMAR IDADE DATA PARA INT??
+        # NÃO CONSEGUI CALCULAR A IDADE PARA ENTRAR NA FUNÇÃO CORRETAMENTE
+        total_sem_desconto = self._qtd * self._produto_vendido.valor
+      
+      # DAQUI PRA BAIXO ESTÁ OK:
+      
+        if idade > 65:
+            percentual_desconto = 0.2 # Desconto de 20%
+            valor_desconto_idade = total_sem_desconto * percentual_desconto
+            
+            valor_desconto_acima150 = 0.0 # SE COMPRA MENOR QUE 150 CONSIDERA ESSE DESCONTO
+            
+            if total_sem_desconto > 150.0:
+                percentual_desconto = 0.1 # Desconto de 10%
+                valor_desconto_acima150 = total_sem_desconto * percentual_desconto
+            
+            desconto_final = valor_desconto_idade if valor_desconto_idade >= valor_desconto_acima150 else valor_desconto_acima150
+
+        elif total_sem_desconto > 150.0:
+            percentual_desconto = 0.1 # Desconto de 10%
+            valor_desconto_acima150 = total_sem_desconto * percentual_desconto
+            
+            desconto_final = valor_desconto_acima150
+
+        else:
+            desconto_final = 0.0
+
+        total_final = total_sem_desconto - desconto_final
+        return total_final
+
+
+
+
+
+
+
+
+### BRENDA NÃO MEXEU ABAIXO (12/08/2023):
 
 def main():
     while True:
