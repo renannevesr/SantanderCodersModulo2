@@ -10,29 +10,38 @@ class Clientes:
         self._cpf: str = cpf
         self.nome: str = nome
         self.data_nascimento: date = data_nascimento
+        self._idade = int((date.today() - datetime.strptime(data_nascimento, "%Y-%m-%d").date()).days / 365)
     
     @property
     def cpf(self) -> str:
         return self._cpf
+    
+    @cpf.setter
+    def setter_cpf(self):
+        pass
+    
+    @property
+    def idade(self) -> str:
+        return self._idade
+    
+    @idade.setter
+    def setter_idade(self):
+        pass
 
+    def adicionar_cliente() -> None:
+        cpf = input("Digite o CPF do cliente: ")
+        nome = input("Digite o Nome do cliente: ")
+        data_nascimento = input("Digite a Data de Nascimento do cliente: ")
 
+        novo_cliente = Clientes(cpf, nome, data_nascimento)
+        clientes.append(novo_cliente)
 
-def adicionar_cliente() -> None:
-    cpf = input("Digite o CPF do cliente: ")
-    nome = input("Digite o Nome do cliente: ")
-    data_nascimento = input("Digite a Data de Nascimento do cliente: ")
-
-    novo_cliente = Clientes(cpf, nome, data_nascimento)
-    clientes.append(novo_cliente)
-
-def busca_cliente_cpf() -> Clientes:
-    cpf = input("Digite o CPF do cliente: ")
-    for cliente in clientes:
-        if cliente.cpf == cpf:
-            print(cliente.nome)
-            return cliente
-
-
+    def busca_cliente_cpf() -> Clientes:
+        cpf = input("Digite o CPF do cliente: ")
+        for cliente in clientes:
+            if cliente.cpf == cpf:
+                print(cliente.nome)
+                return cliente
 
 
 
@@ -200,7 +209,7 @@ def main():
 
 1 - Inserir Clientes
 2 - Inserir Medicamentos
-3 - Sair\n
+0 - Sair\n
 """
         print(menu_str)
 
@@ -215,6 +224,9 @@ def main():
 
         elif opcao == '3':
             print("Saindo...")
+            break
+        elif opcao == '0':
+            print("Saindo do sistema.")
             break
 
 if __name__ == "__main__":
