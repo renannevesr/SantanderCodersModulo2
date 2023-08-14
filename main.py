@@ -34,17 +34,11 @@ class Clientes:
     def cpf(self) -> str:
         return self._cpf
     
-    @cpf.setter
-    def setter_cpf(self):
-        pass
     
     @property
     def idade(self) -> str:
         return self._idade
     
-    @idade.setter
-    def setter_idade(self):
-        pass
 
     def adicionar_cliente() -> None:
         cpf = input("Digite o CPF do cliente: ")
