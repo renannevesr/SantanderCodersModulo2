@@ -83,6 +83,31 @@ class Laboratorios():
         self.telefone: str = telefone
         self.cidade: str = cidade
         self.estado: str = estado
+    @classmethod
+    def cadastrar_labotarorio(cls, nome: str, endereco: str, telefone: str, cidade: str, estado: str) -> None:
+        ja_cadastrado = False
+        
+        for lab in cls.laboratorios:
+            if nome == lab.nome:
+                ja_cadastrado = True
+                print(f'O laboratório {nome} já é cadastrado.')
+                continue
+            else:
+                pass
+        if not ja_cadastrado:
+            novo_lab = cls(nome, endereco, telefone, cidade, estado)
+            cls.laboratorios.append(novo_lab)
+            print(f'O laboratório {nome} foi cadastrado.')
+
+    @classmethod
+    def lista_labotarorios(cls) -> list:
+        for lab in cls.laboratorios:
+            print(lab)
+        return
+    
+    def __str__(self) -> list:
+        return f'Laboratório: {self.nome}, Endereço: {self.endereco}, Telefone: {self.telefone}, Cidade: {self.cidade}, Estado: {self.estado}'
+    
 
 
 class Medicamentos():
@@ -215,11 +240,6 @@ class Vendas():
     @property
     def qtd(self) -> List[ int ]:
         return self._qtd
-
-
-
-
-
 
 
 ### BRENDA NÃO MEXEU ABAIXO (12/08/2023):
