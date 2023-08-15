@@ -100,12 +100,12 @@ class Laboratorios():
             print(f'O laboratório {nome} foi cadastrado.')
 
     @classmethod
-    def lista_labotarorios(cls) -> list:
+    def lista_labotarorios(cls) -> None:
         for lab in cls.laboratorios:
             print(lab)
         return
     
-    def __str__(self) -> list:
+    def __str__(self) -> str:
         return f'Laboratório: {self.nome}, Endereço: {self.endereco}, Telefone: {self.telefone}, Cidade: {self.cidade}, Estado: {self.estado}'
     
 
@@ -190,6 +190,7 @@ class MedicamentosFitoterapicos(Medicamentos):
     def __init__(self, nome: str, composto_principal: str,
                   laboratorio: Laboratorios, descricao: str, valor: float):
         super().__init__(nome, composto_principal, laboratorio, descricao, valor)
+
 
 
 class MedicamentosQuimioterapicos(Medicamentos):
