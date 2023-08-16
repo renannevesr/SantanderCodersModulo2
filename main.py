@@ -31,7 +31,7 @@ class Clientes:
         self._idade = int((date.today() - datetime.strptime(data_nascimento, "%Y-%m-%d").date()).days / 365)
     
     @classmethod
-    def relatorio_cliente():
+    def relatorio_cliente(cls):
         clientes_ordenados = sorted(Clientes.clientes, key=lambda cliente: cliente.nome)
         for cliente in clientes_ordenados:
             print(f"Nome: {cliente.nome}, CPF: {cliente._cpf}, Data de Nascimento: {cliente.data_nascimento}")
@@ -57,16 +57,23 @@ class Clientes:
         return self._idade
 
     @classmethod
-    def adicionar_cliente() -> None:
+    def adicionar_cliente(cls) -> None:
         cpf = input("Digite o CPF do cliente: ")
         nome = input("Digite o Nome do cliente: ")
-        data_nascimento = input("Digite a Data de Nascimento do cliente: ")
+        while True:
+            data_nascimento = input("Digite a Data de Nascimento do cliente (AAAA-MM-DD): ")
+            try:
+                teste = datetime.strptime(data_nascimento, "%Y-%m-%d").date()
+                break  
+            except ValueError:
+                print("Formato de data incorreto. Certifique-se de usar o formato AAAA-MM-DD.")
+
 
         novo_cliente = Clientes(cpf, nome, data_nascimento)
         Clientes.clientes.append(novo_cliente)
 
     @classmethod
-    def busca_cliente_cpf() -> "Clientes":
+    def busca_cliente_cpf(cls) -> "Clientes":
         cpf = input("Digite o CPF do cliente: ")
         for cliente in Clientes.clientes:
             if cliente._cpf == cpf:
@@ -121,7 +128,7 @@ class Medicamentos():
         self.valor: float = valor
     
     @classmethod
-    def adicionar_medicamento() -> None:
+    def adicionar_medicamento(cls) -> None:
         nome = input("Digite o Nome do Medicamento: ")
         composto_principal = input("Digite o Composto Principal do Medicamento: ")
         laboratorio = input("Digite o Laboratório do Medicamento: ")
@@ -203,12 +210,17 @@ class MedicamentosQuimioterapicos(Medicamentos):
 
 
 class Vendas():
-    def __init__(self, cliente: Clientes, produto_vendido: Medicamentos, qtd: int):
+    vendas_registradas = [] #lista das vendas registradas
+    _produtos_vendidos = []
+        # def __init__(self, cliente: Clientes, produto_vendido: Medicamentos, qtd: int):
+    def __init__(self, cliente: Clientes):
         self._data: datetime = datetime.now()
         self._cliente: Clientes = cliente
-        self._produto_vendido: list[Medicamentos] = produto_vendido
-        self._qtd: int = qtd
-        self._valor_total: float  # Tirei a formula porque estava dando erro usar a função pra ter o valor dessa varável
+        self._itens_vendidos : list= [] 
+        # self._produto_vendido: list[Medicamentos] = []
+        self._qtd: list = []
+        self._valor_total: float  =0.0
+        # Tirei a formula porque estava dando erro usar a função pra ter o valor dessa varável
         ## Se quiserem, podemos tentar colocar self._valor_total: automático com @classmethod
 
 # FUNÇÃO _calculo_valor_total FUNCIONA CORRETAMENTE (TESTEI EM OUTRO ARQUIVO)
@@ -218,43 +230,67 @@ class Vendas():
 # FUNÇÃO _calculo_valor_total ESTÁ CALCULANDO O VALOR COM DESCONTO
 
     @classmethod
-    def _calculo_valor_total(self) -> float:
-        # Sorry quem tinha feito essa parte, acabei mudando bastante: ajustei o tema da idade que pediram no comentário e dei uma simplificada na sintaxe
-        total_sem_desconto = self._qtd * self._produto_vendido.valor
+    def _calculo_valor_total(self):
+        total_sem_desconto = sum(qtd * produto.valor for produto, qtd in self._itens_vendidos)
         desconto_valor = 0.1 if total_sem_desconto > 150.00 else 0.0
         desconto_idade = 0.2 if self._cliente.idade > 65 else 0.0
-        desconto_final = max(desconto_valor,desconto_idade)
+        desconto_final = max(desconto_valor, desconto_idade)
 
         total_final = total_sem_desconto - (total_sem_desconto * desconto_final)
         return total_final
+        # def _calculo_valor_total(self) -> float:
+    #     # Sorry quem tinha feito essa parte, acabei mudando bastante: ajustei o tema da idade que pediram no comentário e dei uma simplificada na sintaxe
+    #     total_sem_desconto = self._qtd * self._produto_vendido.valor
+    #     desconto_valor = 0.1 if total_sem_desconto > 150.00 else 0.0
+    #     desconto_idade = 0.2 if self._cliente.idade > 65 else 0.0
+    #     desconto_final = max(desconto_valor,desconto_idade)
+
+    #     total_final = total_sem_desconto - (total_sem_desconto * desconto_final)
+    #     return total_final
     @classmethod
     def adicionar_produto_vendido(self, produto_vendido: Medicamentos, qtd: int):
-            self._produtos_vendidos.append(produto_vendido)
-            self._qtd.append(qtd)
-            self._valor_total = self._calculo_valor_total()
-    @property
-    def valor_total(self) -> float:
-        return self._valor_total
-    @property
-    def produtos_vendidos(self) -> List[Medicamentos]:
-        return self._produtos_vendidos
-    @property
-    def qtd(self) -> List[ int ]:
-        return self._qtd
+        self._itens_vendidos.append((produto_vendido, qtd))
+        self._valor_total = self._calculo_valor_total()
+    # def adicionar_produto_vendido(self, produto_vendido: Medicamentos, qtd: int):
+    #         # self._produtos_vendidos.append(produto_vendido)
+    #         Vendas._produtos_vendidos.append(produto_vendido)
+    #         self.qtd.append(qtd)
+    #         self.valor_total = self._calculo_valor_total()
+    # @property
+    # def valor_total(self) -> float:
+    #     return self._valor_total
+    # @property
+    # def produtos_vendidos(self) -> List[Medicamentos]:
+    #     return self._produtos_vendidos
+    # @property
+    # def qtd(self) -> List[ int ]:
+    #     return self._qtd
+    
+    def registrar_venda(self) -> "Vendas":
+        Vendas.vendas_registradas.append(self)
+        print("Venda registrada!")
 
 
-### BRENDA NÃO MEXEU ABAIXO (12/08/2023):
-
-def main():
+def seed():
     medicamentos_quimioterapicos = [
-    Medicamentos("Medicamento1", "Composto1", "LaboratorioA", "Descrição do medicamento 1", 10.00),
-    Medicamentos("Medicamento2", "Composto2", "LaboratorioB", "Descrição do medicamento 2", 20.00),
-    Medicamentos("Medicamento3", "Composto3", "LaboratorioC", "Descrição do medicamento 3", 30.00),
-    Medicamentos("Medicamento4", "Composto4", "LaboratorioD", "Descrição do medicamento 4", 40.00),
-    Medicamentos("Medicamento5", "Composto5", "LaboratorioE", "Descrição do medicamento 5", 50.00)
+        Medicamentos("Medicamento1", "Composto1", "LaboratorioA", "Descrição do medicamento 1", 10.00),
+        Medicamentos("Medicamento2", "Composto2", "LaboratorioB", "Descrição do medicamento 2", 20.00),
+        Medicamentos("Medicamento3", "Composto3", "LaboratorioC", "Descrição do medicamento 3", 30.00),
+        Medicamentos("Medicamento4", "Composto4", "LaboratorioD", "Descrição do medicamento 4", 40.00),
+        Medicamentos("Medicamento5", "Composto5", "LaboratorioE", "Descrição do medicamento 5", 50.00)
     ]
-    # for i in medicamentos_quimioterapicos:
-        
+    
+    Medicamentos.medicamentos.extend(medicamentos_quimioterapicos)
+    
+    clientes_padrao=[
+    Clientes("111", "Cliente A", "1990-01-01"),
+    Clientes("222", "Cliente C", "1985-05-15"),
+    Clientes("333", "Cliente B", "1978-08-20")
+    ]
+    Clientes.clientes.extend(clientes_padrao)
+    
+def main():
+    
 
 # Lista de Medicamentos Fitoterápicos
     # medicamentos_fitoterapicos = [
@@ -264,32 +300,59 @@ def main():
     #     Medicamentos("Fitoterapico4", "Composto9", "LaboratorioI", "Descrição do fitoterápico 4", False),
     #     Medicamentos("Fitoterapico5", "Composto10", "LaboratorioJ", "Descrição do fitoterápico 5", False)
     # ]
+    seed()
 
     while True:
         menu_str = """
-\nBoas vindas ao nosso sistema:
+        \nBoas vindas ao nosso sistema:
 
-1 - Inserir Clientes
-2 - Inserir Medicamentos
-0 - Sair\n
-"""
+        1 - Inserir Clientes
+        2 - Inserir Medicamentos
+        3 - Realizar Venda
+        4 - Relatório de Vendas
+        5 - Relatório de Clientes
+        0 - Sair\n
+        """
         print(menu_str)
 
         opcao = input("Escolha uma opção: ")
         if opcao == '1':
             Clientes.adicionar_cliente()
         elif opcao == '2':
-            Clientes.busca_cliente_cpf()  
+            Medicamentos.adicionar_medicamento()
         elif opcao == '3':
-            print("Clientes\/")
-            # print(clientes[0].cpf, clientes[0].nome, clientes[0].data_nascimento)
+            cliente = Clientes.busca_cliente_cpf()
+            if cliente:
+                    print("Lista de medicamentos disponíveis para venda:")
+                    for idx, medicamento in enumerate(Medicamentos.medicamentos, start=1):
+                        print(f"{idx}. {medicamento.nome}")
 
-        elif opcao == '3':
-            print("Saindo...")
-            break
+                    venda = Vendas(cliente)
+                    while True:
+                        try:
+                            num_medicamento = int(input("Digite o número do medicamento a ser vendido (ou 0 para finalizar): "))
+                            if num_medicamento == 0:
+                                break
+
+                            medicamento_selecionado = Medicamentos.medicamentos[num_medicamento - 1]
+                            qtd = int(input("Digite a quantidade: "))
+
+                            venda.adicionar_produto_vendido(medicamento_selecionado, qtd)
+                            print("Produto adicionado à venda.")
+
+                        except (ValueError, IndexError):
+                            print("Opção inválida. Por favor, tente novamente.")
+
+                    venda.registrar_venda()
+        elif opcao == '4':
+            pass
+        elif opcao == '5':
+            Clientes.relatorio_cliente()
         elif opcao == '0':
             print("Saindo do sistema.")
             break
+        else:
+            print("Opção inválida. Por favor, escolha uma opção válida.")
 
 if __name__ == "__main__":
     main()
