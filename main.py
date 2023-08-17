@@ -12,7 +12,7 @@ from typing import List
 # QTD REMEDISO QUIMIO VENDIDOS
 # ALERTA PARA PEDIR RECEITA QUANDO FIZER VENDA DE QUIMIO
 ### MEDICAMENTOS
-## BUSCA POR NOME,FABRICANTE OU ??DESCRICAO PARCIAL??
+## BUSCA POR NOME, FABRICANTE OU ??DESCRICAO PARCIAL?? -- if in :
 ## 
 
 class Clientes:
@@ -21,7 +21,6 @@ class Clientes:
 
     def __init__(self, cpf: str, nome: str, data_nascimento: date):
         if self.cpf_utilizado(cpf):
-            # print('CPF já cadastrado: ', cpf)
             return
         else:
             self.adicionar_cpf(cpf)
@@ -68,9 +67,9 @@ class Clientes:
             except ValueError:
                 print("Formato de data incorreto. Certifique-se de usar o formato AAAA-MM-DD.")
 
-
         novo_cliente = Clientes(cpf, nome, data_nascimento)
         Clientes.clientes.append(novo_cliente)
+
 
     @classmethod
     def busca_cliente_cpf(cls) -> "Clientes":
@@ -80,8 +79,6 @@ class Clientes:
                 print(cliente.nome)
                 return cliente
 
-
-
 class Laboratorios():
     laboratorios = []
     def __init__(self, nome: str, endereco: str, telefone: str, cidade: str, estado: str):
@@ -90,10 +87,10 @@ class Laboratorios():
         self.telefone: str = telefone
         self.cidade: str = cidade
         self.estado: str = estado
+
     @classmethod
     def cadastrar_labotarorio(cls, nome: str, endereco: str, telefone: str, cidade: str, estado: str) -> None:
         ja_cadastrado = False
-        
         for lab in cls.laboratorios:
             if nome == lab.nome:
                 ja_cadastrado = True
@@ -135,7 +132,7 @@ class Medicamentos():
         descricao = input("Digite a Descrição do Medicamento: ")
         valor = float(input("Digite o valor do Medicamento: "))
         tipo = input("Esse Medicamento é Fitoterápico? (SIM/NÃO) ").upper()
-        #Fitoterápico Não Precisa de Receita
+        # Fitoterápico Não Precisa de Receita
         
         controle_tipo = True
         while controle_tipo:
@@ -192,22 +189,76 @@ class Medicamentos():
                 print(medicamento.laboratorio)
                 return lista_medicamentos_descricao
     
-        
+    @classmethod
+    def cadastrar_medicamento(cls, nome: str, composto_principal: str,
+                              laboratorio: Laboratorios, descricao: str, valor: float) -> None:
+        novo_medicamento = cls(nome, composto_principal, laboratorio, descricao, valor)
+        cls.medicamentos.append(novo_medicamento)
+        print(f'O medicamento {nome} foi cadastrado.')
+        return 
+
+    @classmethod
+    def lista_medicamentos(cls) -> None:
+        print('\nLISTA DE MEDICAMENTOS\n')
+        for medicamento in cls.medicamentos:
+            print(medicamento)
+
+    def __str__(self) -> str:
+        return f'Medicamento: {self.nome}, Composto Principal: {self.composto_principal}, ' \
+               f'Laboratório: {self.laboratorio.nome}, Descrição: {self.descricao}, Valor: {self.valor}'
+          
 class MedicamentosFitoterapicos(Medicamentos):
+    lista_fito = []
     def __init__(self, nome: str, composto_principal: str,
                   laboratorio: Laboratorios, descricao: str, valor: float):
         super().__init__(nome, composto_principal, laboratorio, descricao, valor)
 
+    
 
+    @classmethod
+    def cadastrar_med_fito(cls, nome: str, composto_principal: str,
+                              laboratorio: Laboratorios, descricao: str, valor: float) -> None:
+        novo_medicamento = cls(nome, composto_principal, laboratorio, descricao, valor)
+        cls.medicamentos.append(novo_medicamento)
+        cls.lista_fito.append(novo_medicamento)
+        # Medicamentos.medicamentos.append(novo_medicamento)
+        print(f'O medicamento {nome} foi cadastrado.')
+        return 
+    
+    @classmethod
+    def lista_med_fito(cls) -> None:
+        print('\nLISTA DE FITOTERAPICOS\n')
+        for fito in cls.lista_fito:
+            print(fito)
+
+    def __str__(self) -> str:
+        return f'Medicamento: {self.nome}, Composto Principal: {self.composto_principal}, ' \
+                f'Laboratório: {self.laboratorio.nome}, Descrição: {self.descricao}, Valor: {self.valor}'
 
 class MedicamentosQuimioterapicos(Medicamentos):
     def __init__(self, nome: str, composto_principal: str,
                   laboratorio: Laboratorios, descricao: str, valor: float, receita: bool):
         super().__init__(nome, composto_principal, laboratorio, descricao, valor )
         self.receita: bool = receita
-            
 
+    @classmethod
+    def cadastrar_med_quimio(cls, nome: str, composto_principal: str,
+                              laboratorio: Laboratorios, descricao: str, valor: float, receita: bool) -> None:
+        novo_medicamento = cls(nome, composto_principal, laboratorio, descricao, valor, receita)
+        cls.medicamentos.append(novo_medicamento)
+        cls.lista_quimio.append(novo_medicamento)
+        print(f'O medicamento {nome} foi cadastrado.')
+        return 
+    
+    @classmethod
+    def lista_med_quimio(cls) -> None:
+        print('\nLISTA DE FITOTERAPICOS\n')
+        for fito in cls.lista_quimio:
+            print(fito)
 
+    def __str__(self) -> str:
+        return f'Medicamento: {self.nome}, Composto Principal: {self.composto_principal}, Laboratório: {self.laboratorio.nome}, ' \
+                f'Descrição: {self.descricao}, Valor: {self.valor}, Precisa de receita: {"Sim" if self.receita else "Nâo"}'
 
 class Vendas():
     vendas_registradas = [] #lista das vendas registradas
@@ -219,7 +270,7 @@ class Vendas():
         self._itens_vendidos : list= [] 
         # self._produto_vendido: list[Medicamentos] = []
         self._qtd: list = []
-        self._valor_total: float  =0.0
+        self._valor_total: float = 0.0
         # Tirei a formula porque estava dando erro usar a função pra ter o valor dessa varável
         ## Se quiserem, podemos tentar colocar self._valor_total: automático com @classmethod
 
@@ -238,15 +289,7 @@ class Vendas():
 
         total_final = total_sem_desconto - (total_sem_desconto * desconto_final)
         return total_final
-        # def _calculo_valor_total(self) -> float:
-    #     # Sorry quem tinha feito essa parte, acabei mudando bastante: ajustei o tema da idade que pediram no comentário e dei uma simplificada na sintaxe
-    #     total_sem_desconto = self._qtd * self._produto_vendido.valor
-    #     desconto_valor = 0.1 if total_sem_desconto > 150.00 else 0.0
-    #     desconto_idade = 0.2 if self._cliente.idade > 65 else 0.0
-    #     desconto_final = max(desconto_valor,desconto_idade)
 
-    #     total_final = total_sem_desconto - (total_sem_desconto * desconto_final)
-    #     return total_final
     @classmethod
     def adicionar_produto_vendido(self, produto_vendido: Medicamentos, qtd: int):
         self._itens_vendidos.append((produto_vendido, qtd))
@@ -266,22 +309,37 @@ class Vendas():
     # def qtd(self) -> List[ int ]:
     #     return self._qtd
     
-    def registrar_venda(self) -> "Vendas":
+    def registrar_venda(self) -> None:
         Vendas.vendas_registradas.append(self)
         print("Venda registrada!")
-
+        return
 
 def seed():
-    medicamentos_quimioterapicos = [
-        Medicamentos("Medicamento1", "Composto1", "LaboratorioA", "Descrição do medicamento 1", 10.00),
-        Medicamentos("Medicamento2", "Composto2", "LaboratorioB", "Descrição do medicamento 2", 20.00),
-        Medicamentos("Medicamento3", "Composto3", "LaboratorioC", "Descrição do medicamento 3", 30.00),
-        Medicamentos("Medicamento4", "Composto4", "LaboratorioD", "Descrição do medicamento 4", 40.00),
-        Medicamentos("Medicamento5", "Composto5", "LaboratorioE", "Descrição do medicamento 5", 50.00)
-    ]
+    # medicamentos_quimioterapicos = [
+    #     Medicamentos("Medicamento1", "Composto1", "LaboratorioA", "Descrição do medicamento 1", 10.00),
+    #     Medicamentos("Medicamento2", "Composto2", "LaboratorioB", "Descrição do medicamento 2", 20.00),
+    #     Medicamentos("Medicamento3", "Composto3", "LaboratorioC", "Descrição do medicamento 3", 30.00),
+    #     Medicamentos("Medicamento4", "Composto4", "LaboratorioD", "Descrição do medicamento 4", 40.00),
+    #     Medicamentos("Medicamento5", "Composto5", "LaboratorioE", "Descrição do medicamento 5", 50.00)
+    # ]
     
-    Medicamentos.medicamentos.extend(medicamentos_quimioterapicos)
-    
+    # Medicamentos.medicamentos.extend(medicamentos_quimioterapicos)
+    Laboratorios.cadastrar_labotarorio('Lab01', 'Rua 001', '00000000', 'cidade 001', 'estado 001')
+    Laboratorios.cadastrar_labotarorio('Lab02', 'Rua 002', '000000002', 'cidade 002', 'estado 002')
+    Laboratorios.cadastrar_labotarorio('Lab03', 'Rua 003', '000000003', 'cidade 003', 'estado 003')
+    Laboratorios.cadastrar_labotarorio('Lab04', 'Rua 004', '000000004', 'cidade 004', 'estado 004')
+    Laboratorios.cadastrar_labotarorio('Lab05', 'Rua 005', '000000005', 'cidade 005', 'estado 005')
+    MedicamentosFitoterapicos.cadastrar_med_fito('Med01', 'Composto A', Laboratorios.laboratorios[0], 'Descrição do medicamento 1', 10.0)
+    MedicamentosFitoterapicos.cadastrar_med_fito('Med02', 'Composto B', Laboratorios.laboratorios[1], 'Descrição do medicamento 2', 15.0)
+    MedicamentosFitoterapicos.cadastrar_med_fito('Med03', 'Composto c', Laboratorios.laboratorios[2], 'Descrição do medicamento 3', 10.0)
+    MedicamentosFitoterapicos.cadastrar_med_fito('Med04', 'Composto D', Laboratorios.laboratorios[3], 'Descrição do medicamento 4', 15.0)
+    MedicamentosFitoterapicos.cadastrar_med_fito('Med05', 'Composto E', Laboratorios.laboratorios[4], 'Descrição do medicamento 5', 10.0)
+    MedicamentosQuimioterapicos.cadastrar_med_quimio('Med06', 'Composto F', Laboratorios.laboratorios[0], 'Descrição do medicamento 6', 10.0, True)
+    MedicamentosQuimioterapicos.cadastrar_med_quimio('Med07', 'Composto G', Laboratorios.laboratorios[1], 'Descrição do medicamento 7', 15.0, True)
+    MedicamentosQuimioterapicos.cadastrar_med_quimio('Med08', 'Composto H', Laboratorios.laboratorios[2], 'Descrição do medicamento 8', 10.0, True)
+    MedicamentosQuimioterapicos.cadastrar_med_quimio('Med09', 'Composto I', Laboratorios.laboratorios[3], 'Descrição do medicamento 9', 15.0, True)
+    MedicamentosQuimioterapicos.cadastrar_med_quimio('Med010', 'Composto J', Laboratorios.laboratorios[4], 'Descrição do medicamento 10', 10.0, True)
+
     clientes_padrao=[
     Clientes("111", "Cliente A", "1990-01-01"),
     Clientes("222", "Cliente C", "1985-05-15"),
@@ -307,10 +365,14 @@ def main():
         \nBoas vindas ao nosso sistema:
 
         1 - Inserir Clientes
-        2 - Inserir Medicamentos
-        3 - Realizar Venda
-        4 - Relatório de Vendas
-        5 - Relatório de Clientes
+        2 - Inserir Medicamento Fitoterápico
+        3 - Inserir Medicamento Quimioterápicos
+        4 - Realizar Venda
+        5 - Relatório de Vendas
+        6 - Relatório de Clientes
+        7 - Lista de medicamentos
+        8 - Lista de medicamentos Fitoterápicos
+        9 - Lista de medicamentos Quimioterápicos 
         0 - Sair\n
         """
         print(menu_str)
@@ -348,6 +410,12 @@ def main():
             pass
         elif opcao == '5':
             Clientes.relatorio_cliente()
+        elif opcao == '6':
+            Medicamentos.lista_medicamentos()
+        elif opcao == '7':
+            MedicamentosFitoterapicos.lista_med_fito()
+        elif opcao == '8':
+            MedicamentosQuimioterapicos.lista_med_quimio()
         elif opcao == '0':
             print("Saindo do sistema.")
             break
