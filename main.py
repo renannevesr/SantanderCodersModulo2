@@ -112,10 +112,7 @@ class Laboratorios():
     def __str__(self) -> str:
         return f'Laboratório: {self.nome}, Endereço: {self.endereco}, Telefone: {self.telefone}, Cidade: {self.cidade}, Estado: {self.estado}'
     
-
-
 class Medicamentos():
-    medicamentos = []
     def __init__(self, nome: str, composto_principal: str,
                   laboratorio: Laboratorios, descricao: str, valor: float):
         self.nome: str = nome
@@ -123,51 +120,49 @@ class Medicamentos():
         self.laboratorio: Laboratorios = laboratorio
         self.descricao: str = descricao
         self.valor: float = valor
+
+    @classmethod
+    def lista_todos_medicamentos(cls):
+        return MedicamentosFitoterapicos.lista_fito.extend(MedicamentosQuimioterapicos.lista_med_quimio)
     
-    @classmethod
-    def adicionar_medicamento(cls) -> None:
-        nome = input("Digite o Nome do Medicamento: ")
-        composto_principal = input("Digite o Composto Principal do Medicamento: ")
-        laboratorio = input("Digite o Laboratório do Medicamento: ")
-        descricao = input("Digite a Descrição do Medicamento: ")
-        valor = float(input("Digite o valor do Medicamento: "))
-        tipo = input("Esse Medicamento é Fitoterápico? (SIM/NÃO) ").upper()
-        # Fitoterápico Não Precisa de Receita
+    # @classmethod
+    # def adicionar_medicamento(cls) -> None:
+    #     nome = input("Digite o Nome do Medicamento: ")
+    #     composto_principal = input("Digite o Composto Principal do Medicamento: ")
+    #     laboratorio = input("Digite o Laboratório do Medicamento: ")
+    #     descricao = input("Digite a Descrição do Medicamento: ")
+    #     valor = float(input("Digite o valor do Medicamento: "))
+    #     tipo = input("Esse Medicamento é Fitoterápico? (SIM/NÃO) ").upper()
+    #     # Fitoterápico Não Precisa de Receita
         
-        controle_tipo = True
-        while controle_tipo:
-            if tipo == "SIM":
-                novo_medicamento = MedicamentosFitoterapicos(nome, composto_principal, laboratorio, descricao, valor)
-                Medicamentos.medicamentos.append(novo_medicamento)
-                controle_tipo = False
+    #     controle_tipo = True
+    #     while controle_tipo:
+    #         if tipo == "SIM":
+    #             novo_medicamento = MedicamentosFitoterapicos(nome, composto_principal, laboratorio, descricao, valor)
+    #             Medicamentos.medicamentos.append(novo_medicamento)
+    #             controle_tipo = False
             
-            elif tipo == "NÃO":
-                receita = input("Esse Medicamento exige Receita? (SIM/NÃO )").upper()
+    #         elif tipo == "NÃO":
+    #             receita = input("Esse Medicamento exige Receita? (SIM/NÃO )").upper()
 
-                controle_receita = True
-                while controle_receita:
-                    if receita == 'SIM':
-                        novo_medicamento = MedicamentosQuimioterapicos(nome, composto_principal, laboratorio, descricao, valor, True)
-                        Medicamentos.medicamentos.append(novo_medicamento)
-                        controle_receita = False
+    #             controle_receita = True
+    #             while controle_receita:
+    #                 if receita == 'SIM':
+    #                     novo_medicamento = MedicamentosQuimioterapicos(nome, composto_principal, laboratorio, descricao, valor, True)
+    #                     Medicamentos.medicamentos.append(novo_medicamento)
+    #                     controle_receita = False
 
-                    elif receita == 'NÃO':
-                        novo_medicamento = MedicamentosQuimioterapicos(nome, composto_principal, laboratorio, descricao, valor, False)
-                        Medicamentos.medicamentos.append(novo_medicamento)
-                        controle_receita = False
-                    else:
-                        print("Opção Inválida")        
-                controle_tipo = False 
-            else:
-                print("Opção Inválida")
+    #                 elif receita == 'NÃO':
+    #                     novo_medicamento = MedicamentosQuimioterapicos(nome, composto_principal, laboratorio, descricao, valor, False)
+    #                     Medicamentos.medicamentos.append(novo_medicamento)
+    #                     controle_receita = False
+    #                 else:
+    #                     print("Opção Inválida")        
+    #             controle_tipo = False 
+    #         else:
+    #             print("Opção Inválida")
 
-    @classmethod
-    def busca_medicamentos_nome() -> "Medicamentos":
-        nome = input("Digite o Nome do Medicamento: ")
-        for medicamento in Medicamentos.medicamentos:
-            if medicamento.nome == nome:
-                print(medicamento.nome)
-                return medicamento
+
     
     @classmethod
     def busca_medicamentos_laboratorio() -> "Medicamentos":
@@ -214,28 +209,45 @@ class MedicamentosFitoterapicos(Medicamentos):
         super().__init__(nome, composto_principal, laboratorio, descricao, valor)
 
     
-
     @classmethod
     def cadastrar_med_fito(cls, nome: str, composto_principal: str,
                               laboratorio: Laboratorios, descricao: str, valor: float) -> None:
         novo_medicamento = cls(nome, composto_principal, laboratorio, descricao, valor)
-        cls.medicamentos.append(novo_medicamento)
         cls.lista_fito.append(novo_medicamento)
         # Medicamentos.medicamentos.append(novo_medicamento)
         print(f'O medicamento {nome} foi cadastrado.')
         return 
     
     @classmethod
-    def lista_med_fito(cls) -> None:
-        print('\nLISTA DE FITOTERAPICOS\n')
-        for fito in cls.lista_fito:
-            print(fito)
+    def busca_fito_por_nome(cls, nome) -> List:
+        # nome = input("Digite o Nome do Medicamento: ")
+        fito_nome_filtrado = []
+        for medicamento in cls.lista_quimio:
+            if medicamento.nome == nome:
+                fito_nome_filtrado.append(medicamento)
+            
+        if fito_nome_filtrado == []:
+                print('\nNão há medicamentos com este nome. Consulte abaixo a lista completa de medicamentos:')
+
+        return fito_nome_filtrado
+    
+    @classmethod
+    def lista_med_fito(cls, list = []) -> None:
+        print('\nLISTA DE FITOTERÁPICOS\n')
+        if list == []:
+            for fito in cls.lista_fito:
+                print(fito)
+        else:
+            for fito in list:
+                print(fito)
+        return None
 
     def __str__(self) -> str:
         return f'Medicamento: {self.nome}, Composto Principal: {self.composto_principal}, ' \
                 f'Laboratório: {self.laboratorio.nome}, Descrição: {self.descricao}, Valor: {self.valor}'
 
 class MedicamentosQuimioterapicos(Medicamentos):
+    lista_quimio = []
     def __init__(self, nome: str, composto_principal: str,
                   laboratorio: Laboratorios, descricao: str, valor: float, receita: bool):
         super().__init__(nome, composto_principal, laboratorio, descricao, valor )
@@ -245,24 +257,68 @@ class MedicamentosQuimioterapicos(Medicamentos):
     def cadastrar_med_quimio(cls, nome: str, composto_principal: str,
                               laboratorio: Laboratorios, descricao: str, valor: float, receita: bool) -> None:
         novo_medicamento = cls(nome, composto_principal, laboratorio, descricao, valor, receita)
-        cls.medicamentos.append(novo_medicamento)
         cls.lista_quimio.append(novo_medicamento)
         print(f'O medicamento {nome} foi cadastrado.')
-        return 
+        return
     
     @classmethod
-    def lista_med_quimio(cls) -> None:
-        print('\nLISTA DE FITOTERAPICOS\n')
-        for fito in cls.lista_quimio:
-            print(fito)
+    def busca_quimio_por_nome(cls, nome) -> List:
+        # nome = input("Digite o Nome do Medicamento: ")
+        quimio_nome_filtrado = []
+        for medicamento in cls.lista_quimio:
+            if medicamento.nome == nome:
+                quimio_nome_filtrado.append(medicamento)
+            
+        if quimio_nome_filtrado == []:
+                print('\nNão há medicamentos com este nome. Consulte abaixo a lista completa de medicamentos:')
+
+        return quimio_nome_filtrado
+    
+    @classmethod
+    def lista_med_quimio(cls, list = []) -> None:
+        print('\nLISTA DE QUIMIOTERÁPICOS\n')
+        if list == []:
+            for quimio in cls.lista_quimio:
+                print(quimio)
+        else:
+            for quimio in list:
+                print(quimio)
+        return None
 
     def __str__(self) -> str:
         return f'Medicamento: {self.nome}, Composto Principal: {self.composto_principal}, Laboratório: {self.laboratorio.nome}, ' \
                 f'Descrição: {self.descricao}, Valor: {self.valor}, Precisa de receita: {"Sim" if self.receita else "Nâo"}'
 
+class Carrinho():
+    carrinho = []
+    def __init__(self, medicamento: Medicamentos, quantidade: int):
+        self.medicamento: Medicamentos
+        self.quantidade = quantidade
+
+    @classmethod
+    def criar_carrinho(cls) -> None:
+        cls.carrinho = []
+        return None
+    
+    @classmethod
+    def adicionar_ao_carrinho(cls, med: Medicamentos, qtd: int) -> None:
+        items = cls(med, qtd)
+        cls.carrinho.append(items)
+        print(f'{med.nome} adicionado ao carrinho com sucesso!')
+        return None
+
+
+    def registrar_venda(self) -> None:
+        Vendas.vendas_registradas.append(self)
+        print("Venda registrada!")
+        return
+
+
 class Vendas():
     vendas_registradas = [] #lista das vendas registradas
     _produtos_vendidos = []
+    carrinho = []
+    
         # def __init__(self, cliente: Clientes, produto_vendido: Medicamentos, qtd: int):
     def __init__(self, cliente: Clientes):
         self._data: datetime = datetime.now()
@@ -281,6 +337,11 @@ class Vendas():
 # FUNÇÃO _calculo_valor_total ESTÁ CALCULANDO O VALOR COM DESCONTO
 
     @classmethod
+    def apresentar_catalogo(cls) -> None:
+        print(f'\nOlá, hoje temos os seguintes itens disponíveis:{Medicamentos.lista_todos_medicamentos()}')
+        return None
+
+    @classmethod
     def _calculo_valor_total(self):
         total_sem_desconto = sum(qtd * produto.valor for produto, qtd in self._itens_vendidos)
         desconto_valor = 0.1 if total_sem_desconto > 150.00 else 0.0
@@ -294,25 +355,12 @@ class Vendas():
     def adicionar_produto_vendido(self, produto_vendido: Medicamentos, qtd: int):
         self._itens_vendidos.append((produto_vendido, qtd))
         self._valor_total = self._calculo_valor_total()
-    # def adicionar_produto_vendido(self, produto_vendido: Medicamentos, qtd: int):
-    #         # self._produtos_vendidos.append(produto_vendido)
-    #         Vendas._produtos_vendidos.append(produto_vendido)
-    #         self.qtd.append(qtd)
-    #         self.valor_total = self._calculo_valor_total()
-    # @property
-    # def valor_total(self) -> float:
-    #     return self._valor_total
-    # @property
-    # def produtos_vendidos(self) -> List[Medicamentos]:
-    #     return self._produtos_vendidos
-    # @property
-    # def qtd(self) -> List[ int ]:
-    #     return self._qtd
     
-    def registrar_venda(self) -> None:
-        Vendas.vendas_registradas.append(self)
-        print("Venda registrada!")
+    @classmethod
+    def finalizar_venda(cls, carrinho: Carrinho) -> None:
+        cls.
         return
+
 
 def seed():
     # medicamentos_quimioterapicos = [
@@ -371,7 +419,7 @@ def main():
         5 - Relatório de Vendas
         6 - Relatório de Clientes
         7 - Lista de medicamentos
-        8 - Lista de medicamentos Fitoterápicos
+        8 - Buscar medicamentos
         9 - Lista de medicamentos Quimioterápicos 
         0 - Sair\n
         """
@@ -407,15 +455,59 @@ def main():
 
                     venda.registrar_venda()
         elif opcao == '4':
+            validacao_cpf = True
+            while validacao_cpf:
+                cpf_cliente = input('Informe o CPF do cliente para realizar a venda:')
+                for c in Clientes.cpfs_utilizados:
+                    if cpf_cliente in c:
+                        loop_venda = True
+                        validacao_cpf = False
+                    else:
+                       print(f'O CPF {c} não possui cadastro') 
+
+            Carrinho.criar_carrinho()
+            Vendas.apresentar_catalogo()
+            while loop_venda:
+                input_catalogo = str(input('\n Informe o nome do medicamento que deseja comprar, ou digite 0 para finalizar a venda:'))
+                if input_catalogo == '0':
+                    loop_venda = False
+                else:
+                    for med in Medicamentos.lista_todos_medicamentos():
+                        produto_existe = False
+                        if med.nome == input_catalogo:
+                            produto_existe = True
+                            qtd_invalida = True
+                            while qtd_invalida:
+                                qtd = input(f"O produo selecionado foi: \n {med}. \n" \
+                                        f"Quantas unidades do produto deseja levar? \n")
+                                try:
+                                    qtd = int(qtd)
+                                    qtd_invalida = False
+                                except:
+                                    print('\nQuantidade invalida, por favor, digite um número:')
+        
+                            Carrinho.adicionar_ao_carrinho(cpf_cliente, med, qtd)
+                        
+                    if not produto_existe:
+                        print("Não encontramos esta produto, pode favor, revise o nome digitado.")
+
+        if input_catalogo
+            
+
             pass
         elif opcao == '5':
             Clientes.relatorio_cliente()
         elif opcao == '6':
             Medicamentos.lista_medicamentos()
         elif opcao == '7':
-            MedicamentosFitoterapicos.lista_med_fito()
+            print(Medicamentos.lista_todos_medicamentos)
         elif opcao == '8':
-            MedicamentosQuimioterapicos.lista_med_quimio()
+            nome = str(input("Digite o Nome do Medicamento: "))
+            quimio_filtrado = MedicamentosQuimioterapicos.busca_quimio_por_nome(nome)
+            fito_filtrado = MedicamentosQuimioterapicos.busca_quimio_por_nome(nome)
+            MedicamentosQuimioterapicos.lista_med_quimio(quimio_filtrado)
+            MedicamentosFitoterapicos.lista_med_fito(fito_filtrado)
+
         elif opcao == '0':
             print("Saindo do sistema.")
             break
