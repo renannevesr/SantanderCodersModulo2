@@ -291,9 +291,11 @@ class MedicamentosQuimioterapicos(Medicamentos):
 
 class Carrinho():
     carrinho = []
-    def __init__(self, medicamento: Medicamentos, quantidade: int):
-        self.medicamento: Medicamentos
+    def __init__(self, cpf_cliente: str, medicamento: Medicamentos, quantidade: int):
+        self.cpf_cliente = cpf_cliente
+        self.medicamento = medicamento
         self.quantidade = quantidade
+        
 
     @classmethod
     def criar_carrinho(cls) -> None:
@@ -301,20 +303,30 @@ class Carrinho():
         return None
     
     @classmethod
-    def adicionar_ao_carrinho(cls, med: Medicamentos, qtd: int) -> None:
-        items = cls(med, qtd)
+    def adicionar_ao_carrinho(cls, cpf_cliente:str, medicamento: Medicamentos, qtd: int) -> None:
+        items = cls(cpf_cliente, medicamento, qtd)
         cls.carrinho.append(items)
-        print(f'{med.nome} adicionado ao carrinho com sucesso!')
+        print(f'{medicamento.nome} adicionado ao carrinho com sucesso!')
         return None
 
-
-    def registrar_venda(self) -> None:
-        Vendas.vendas_registradas.append(self)
-        print("Venda registrada!")
-        return
+    
+    @classmethod
+    def decompor_carrinho(cls):
+        lista_decomposta = []
+        item_decomposto = []
+        i = 0
+        for item in cls.carrinho:
+            if isinstance(item.medicamento,MedicamentosQuimioterapicos):
+                item_decomposto.append(['QUIMIO', item.cpf_cliente, item.medicamento.nome, item.medicamento.valor, item.quantidade])
+            elif isinstance(item.medicamento,MedicamentosFitoterapicos):
+                item_decomposto.append(['FITO', item.cpf_cliente, item.medicamento.nome, item.medicamento.valor, item.quantidade])
+        lista_decomposta.extend(item_decomposto)
+        return lista_decomposta # [TIPO:srt,CPF: str, MEDICAMENTO: str, PRECO: float, QTD: int]
+ 
 
 
 class Vendas():
+    lista_vendas = []
     vendas_registradas = [] #lista das vendas registradas
     _produtos_vendidos = []
     carrinho = []
@@ -342,20 +354,32 @@ class Vendas():
         return None
 
     @classmethod
-    def _calculo_valor_total(self):
-        total_sem_desconto = sum(qtd * produto.valor for produto, qtd in self._itens_vendidos)
-        desconto_valor = 0.1 if total_sem_desconto > 150.00 else 0.0
-        desconto_idade = 0.2 if self._cliente.idade > 65 else 0.0
-        desconto_final = max(desconto_valor, desconto_idade)
+    def _calculo_valor(self, lista_carrinho: list) -> list:
+        lista_pre_venda = []
+        desconto_valor = 0.9 if total_sem_desconto > 150.00 else 1.0
+        desconto_idade = 0.8 if self._cliente.idade > 65 else 1.0
+        desconto_final = min(desconto_valor, desconto_idade)
 
-        total_final = total_sem_desconto - (total_sem_desconto * desconto_final)
-        return total_final
+        for item in lista_carrinho:
+            total_sem_desconto = sum(item[-1] * item[-2]) # quantidade * valor
+            total_com_desconto = sum(item[-1] * item[-2] * desconto_final) # quantidade * valor * desconto
+            item.append(total_sem_desconto)
+            item.append(total_com_desconto)
+            lista_pre_venda.extend(item)
+        
+        return lista_pre_venda # [TIPO:srt,CPF: str, MEDICAMENTO: str, PRECO: float, QTD: int, VALOR_S_DESCONTO: float, VALOR_C_DESCONTO: float ]
 
-    @classmethod
-    def adicionar_produto_vendido(self, produto_vendido: Medicamentos, qtd: int):
-        self._itens_vendidos.append((produto_vendido, qtd))
-        self._valor_total = self._calculo_valor_total()
+    # @classmethod
+    # def adicionar_produto_vendido(self, produto_vendido: Medicamentos, qtd: int):
+    #     self._itens_vendidos.append((produto_vendido, qtd))
+    #     self._valor_total = self._calculo_valor_total()
     
+    @classmethod
+    def registrar_venda(self) -> None:
+        Vendas.vendas_registradas.append(self)
+        print("Venda registrada!")
+        return
+
     @classmethod
     def finalizar_venda(cls, carrinho: Carrinho) -> None:
         cls.
@@ -487,11 +511,14 @@ def main():
                                     print('\nQuantidade invalida, por favor, digite um número:')
         
                             Carrinho.adicionar_ao_carrinho(cpf_cliente, med, qtd)
-                        
                     if not produto_existe:
                         print("Não encontramos esta produto, pode favor, revise o nome digitado.")
+        
+    
+        ## var1 = _calculo_valor(decompor_carrinho)
+        ## Carrinho.registrar_venda(var1)
 
-        if input_catalogo
+        # if input_catalogo
             
 
             pass
