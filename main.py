@@ -110,7 +110,7 @@ class Laboratorios():
     def __str__(self) -> str:
         return f'Laboratório: {self.nome}, Endereço: {self.endereco}, Telefone: {self.telefone}, Cidade: {self.cidade}, Estado: {self.estado}'
     
-class Medicamentos():
+class Medicamentos(): 
     def __init__(self, nome: str, composto_principal: str,
                   laboratorio: Laboratorios, descricao: str, valor: float):
         self.nome: str = nome
@@ -118,17 +118,6 @@ class Medicamentos():
         self.laboratorio: Laboratorios = laboratorio
         self.descricao: str = descricao
         self.valor: float = valor
-
-    @classmethod
-    def lista_todos_medicamentos(cls) -> list:
-        print("teste")
-        lista_fito1 = MedicamentosFitoterapicos.lista_fito()
-        print("teste1")
-        lista_quimio1 = MedicamentosQuimioterapicos.lista_med_quimio()
-        print("teste2")
-        lista = lista_fito1.extend(lista_quimio1) 
-        print(type(lista))
-        return lista
     
     @classmethod
     def busca_medicamentos_laboratorio() -> "Medicamentos":
@@ -298,15 +287,14 @@ class Vendas():
 
     @classmethod
     def apresentar_catalogo(cls) -> None:
-        print(f'\nOlá, hoje temos os seguintes itens disponíveis:{Medicamentos.lista_todos_medicamentos()}')
+        print(f'\nOlá, hoje temos os seguintes itens disponíveis:\n')
+        for i in lista_todos_medicamentos():
+            print(i)
         return None
 
     @classmethod
     def _calculo_valor(self, lista_carrinho: list) -> list:
         lista_pre_venda = []
-        desconto_valor = 0.9 if total_sem_desconto > 150.00 else 1.0
-        desconto_idade = 0.8 if self._cliente.idade > 65 else 1.0
-        desconto_final = min(desconto_valor, desconto_idade)
 
         for item in lista_carrinho:
             total_sem_desconto = sum(item[-1] * item[-2]) # quantidade * valor
@@ -314,6 +302,9 @@ class Vendas():
             item.append(total_sem_desconto)
             item.append(total_com_desconto)
             lista_pre_venda.extend(item)
+        desconto_valor = 0.9 if total_sem_desconto > 150.00 else 1.0
+        desconto_idade = 0.8 if self._cliente.idade > 65 else 1.0
+        desconto_final = min(desconto_valor, desconto_idade)
         
         return lista_pre_venda # [TIPO: srt, CPF: str, MEDICAMENTO: str, PRECO: float, QTD: int, VALOR_S_DESCONTO: float, VALOR_C_DESCONTO: float ]
     
@@ -376,6 +367,13 @@ def seed():
     Clientes("333", "Cliente B", "1978-08-20")
     ]
     Clientes.clientes.extend(clientes_padrao)
+
+
+def lista_todos_medicamentos() -> list:
+    lista = MedicamentosFitoterapicos.lista_fito
+    lista_quimio1 = MedicamentosQuimioterapicos.lista_quimio
+    lista.extend(lista_quimio1) 
+    return lista
     
 def main():
     
@@ -462,10 +460,12 @@ def main():
                 if input_catalogo == '0':
                     loop_venda = False
                 else:
-                    lista_medicamentos = Medicamentos.lista_todos_medicamentos()
+                    lista_medicamentos = lista_todos_medicamentos()
                     print(f'\n esse é o tipo: {type(lista_medicamentos)}')
+                    produto_existe = False
                     for med in lista_medicamentos:
                         if med.nome == input_catalogo:
+                            produto_existe = True
                             if isinstance(med, MedicamentosQuimioterapicos):
                                 if med.receita == True:
                                     print(f"O Medicamento {med.nome} necessita de receita! Confira a Receita!\n")
@@ -484,22 +484,23 @@ def main():
                                     print('\nQuantidade invalida, por favor, digite um número:')
         
                             Carrinho.adicionar_ao_carrinho(cpf_cliente, med, qtd)
-                        else:
-                            print("Não encontramos esta produto, pode favor, revise o nome digitado.")
+                    if not produto_existe:
+                        print("Não encontramos esta produto, pode favor, revise o nome digitado.")
         
             var1 = Vendas._calculo_valor(Carrinho.decompor_carrinho())
             Vendas.registrar_venda(var1)
-
-            
-            pass
         elif opcao == '5':
             Clientes.relatorio_cliente()
         elif opcao == '6':
-            print(Medicamentos.lista_todos_medicamentos)
+            lista_6 = lista_todos_medicamentos()
+            for i in lista_6:
+                print(i)
+            # Medicamentos.lista_todos_medicamentos()
         elif opcao == '7': #LISTA FITO
-            print(MedicamentosFitoterapicos.lista_fito)
+            MedicamentosFitoterapicos.lista_med_fito()
         elif opcao == '8': #LISTA QUIMIO
-            print(MedicamentosQuimioterapicos.lista_quimio)
+            for i in MedicamentosQuimioterapicos.lista_quimio:
+                print(i)
         elif opcao == '9': ## REVISAR 
             nome = str(input("Digite o Nome do Medicamento: "))
             quimio_filtrado = MedicamentosQuimioterapicos.busca_quimio_por_nome(nome)
