@@ -111,6 +111,7 @@ class Laboratorios():
         return f'Laboratório: {self.nome}, Endereço: {self.endereco}, Telefone: {self.telefone}, Cidade: {self.cidade}, Estado: {self.estado}'
     
 class Medicamentos(): 
+    medicamentos =[]
     def __init__(self, nome: str, composto_principal: str,
                   laboratorio: Laboratorios, descricao: str, valor: float):
         self.nome: str = nome
@@ -118,6 +119,7 @@ class Medicamentos():
         self.laboratorio: Laboratorios = laboratorio
         self.descricao: str = descricao
         self.valor: float = valor
+       
     
     @classmethod
     def busca_medicamentos_laboratorio() -> "Medicamentos":
@@ -141,8 +143,8 @@ class Medicamentos():
     
     @classmethod
     def cadastrar_medicamento(cls, nome: str, composto_principal: str,
-                              laboratorio: Laboratorios, descricao: str, valor: float) -> None:
-        novo_medicamento = cls(nome, composto_principal, laboratorio, descricao, valor)
+                              laboratorio: Laboratorios, descricao: str, valor: float, tipo: str) -> None:
+        novo_medicamento = cls(nome, composto_principal, laboratorio, descricao, valor, tipo)
         cls.medicamentos.append(novo_medicamento)
         print(f'O medicamento {nome} foi cadastrado.')
         return None
@@ -156,7 +158,86 @@ class Medicamentos():
     def __str__(self) -> str:
         return f'Medicamento: {self.nome}, Composto Principal: {self.composto_principal}, ' \
                f'Laboratório: {self.laboratorio.nome}, Descrição: {self.descricao}, Valor: {self.valor}'
-          
+
+# CLASSE MEDICAMENTO COM AJUSTE INCLUINDO ARGUMENTO "TIPO", PARA TENTAR CRIAR A HERANÇA COMPLETA DOS FITOS E QUIMIOS
+# class Medicamentos(): 
+#     medicamentos =[]
+#     def __init__(self, nome: str, composto_principal: str,
+#                   laboratorio: Laboratorios, descricao: str, valor: float, tipo: str):
+#         self.nome: str = nome
+#         self.composto_principal: str = composto_principal
+#         self.laboratorio: Laboratorios = laboratorio
+#         self.descricao: str = descricao
+#         self.valor: float = valor
+#         self.tipo: str = tipo
+    
+#     @classmethod
+#     def busca_medicamentos_laboratorio() -> "Medicamentos":
+#         lista_medicamentos_laboratorio = []
+#         laboratorio = input("Digite o Laboratório do Medicamento: ")
+#         for medicamento in Medicamentos.medicamentos:
+#             if medicamento.laboratorio == laboratorio:
+#                 lista_medicamentos_laboratorio.append(medicamento)
+#                 print(medicamento.laboratorio)
+#                 return lista_medicamentos_laboratorio
+            
+#     @classmethod     
+#     def busca_medicamentos_descricao() -> "Medicamentos":
+#         lista_medicamentos_descricao = []
+#         descricao = input("Digite a Descrição do Medicamento: ")
+#         for medicamento in Medicamentos.medicamentos:
+#             if descricao in medicamento.descricao:
+#                 lista_medicamentos_descricao.append(medicamento)
+#                 print(medicamento.laboratorio)
+#                 return lista_medicamentos_descricao
+    
+#     @classmethod
+#     def cadastrar_medicamento(cls, nome: str, composto_principal: str,
+#                               laboratorio: Laboratorios, descricao: str, valor: float, tipo: str) -> None:
+#         novo_medicamento = cls(nome, composto_principal, laboratorio, descricao, valor, tipo)
+#         cls.medicamentos.append(novo_medicamento)
+#         print(f'O medicamento {nome} foi cadastrado.')
+#         return None
+
+#     @classmethod
+#     def lista_medicamentos(cls) -> None:
+#         print('\nLISTA DE MEDICAMENTOS\n')
+#         for medicamento in cls.medicamentos:
+#             print(medicamento)
+
+#     def __str__(self) -> str:
+#         return f'Medicamento: {self.nome}, Composto Principal: {self.composto_principal}, ' \
+#                f'Laboratório: {self.laboratorio.nome}, Descrição: {self.descricao}, Valor: {self.valor}'
+
+# TENTANDO TROCAR A CLASSE MEDICAMENTO FITO PARA SENDO HERANÇA DA CLASSE MEDICAMENTOS SOBREPONDO TODAS AS FUNÇÕES DA
+# CLASSE PAI (MEDICAMENTOS) - NÃO CONSEGUI FINALIZAR, POR ISSO COMENTEI
+# class MedicamentosFitoterapicos(Medicamentos):
+    
+#     def __init__(self, nome: str, composto_principal: str,
+#                   laboratorio: Laboratorios, descricao: str, valor: float, tipo: str = "FITOTERAPICO"):
+#         super().__init__(nome, composto_principal, laboratorio, descricao, valor, tipo)
+
+#     @classmethod
+#     def cadastrar_medicamento(cls, nome: str, composto_principal: str,
+#                               laboratorio: Laboratorios, descricao: str, valor: float, tipo: str = "FITOTERAPICO") -> None:
+#         novo_medicamento = cls(nome, composto_principal, laboratorio, descricao, valor, tipo)
+#         Medicamentos.medicamentos.append(novo_medicamento)
+#         print(f'O medicamento {nome} foi cadastrado.')
+#         return None
+
+#     @classmethod
+#     def lista_medicamentos(cls) -> None:
+#         print('\nLISTA DE MEDICAMENTOS FITOTERÁPICOS\n')
+#         lista_fito =[]
+
+#         for medicamento in cls.medicamentos:
+#             if medicamento.tipo == "FITOTERAPICO":
+#                 lista_fito.append(medicamento)
+        
+#         for medicamento in lista_fito:
+#             print(medicamento)
+
+# CLASSE MEDICAMENTOS FITO COMO ESTAVA:
 class MedicamentosFitoterapicos(Medicamentos):
     lista_fito = []
     def __init__(self, nome: str, composto_principal: str,
@@ -175,7 +256,7 @@ class MedicamentosFitoterapicos(Medicamentos):
     @classmethod
     def busca_fito_por_nome(cls, nome) -> List:
         fito_nome_filtrado = []
-        for medicamento in cls.lista_quimio:
+        for medicamento in cls.lista_fito:
             if medicamento.nome == nome:
                 fito_nome_filtrado.append(medicamento)
             
@@ -184,16 +265,23 @@ class MedicamentosFitoterapicos(Medicamentos):
 
         return fito_nome_filtrado
     
-    @classmethod
-    def lista_med_fito(cls, list = []) -> None:
+    @staticmethod
+    def lista_med_fito() -> None:
         print('\nLISTA DE FITOTERÁPICOS\n')
-        if list == []:
-            for fito in cls.lista_fito:
-                print(fito)
-        else:
-            for fito in list:
-                print(fito)
+        for med in MedicamentosFitoterapicos.lista_fito:
+            print(med)
         return None
+    
+    # @classmethod - COMO ERA
+    # def lista_med_fito(cls, list = []) -> None:
+    #     print('\nLISTA DE FITOTERÁPICOS\n')
+    #     if list == []:
+    #         for fito in cls.lista_fito:
+    #             print(fito)
+    #     else:
+    #         for fito in list:
+    #             print(fito)
+    #     return None
 
     def __str__(self) -> str:
         return f'Medicamento: {self.nome}, Composto Principal: {self.composto_principal}, ' \
@@ -350,6 +438,14 @@ def seed():
     Laboratorios.cadastrar_labotarorio('Lab03', 'Rua 003', '000000003', 'cidade 003', 'estado 003')
     Laboratorios.cadastrar_labotarorio('Lab04', 'Rua 004', '000000004', 'cidade 004', 'estado 004')
     Laboratorios.cadastrar_labotarorio('Lab05', 'Rua 005', '000000005', 'cidade 005', 'estado 005')
+
+    # PARA TESTAR NOVA CLASSE DE MEDICAMENTO FITO 
+    # MedicamentosFitoterapicos.cadastrar_medicamento('Med01', 'Composto A', Laboratorios.laboratorios[0], 'Descrição do medicamento 1', 10.0)
+    # MedicamentosFitoterapicos.cadastrar_medicamento('Med02', 'Composto B', Laboratorios.laboratorios[1], 'Descrição do medicamento 2', 15.0)
+    # MedicamentosFitoterapicos.cadastrar_medicamento('Med03', 'Composto c', Laboratorios.laboratorios[2], 'Descrição do medicamento 3', 10.0)
+    # MedicamentosFitoterapicos.cadastrar_medicamento('Med04', 'Composto D', Laboratorios.laboratorios[3], 'Descrição do medicamento 4', 15.0)
+    # MedicamentosFitoterapicos.cadastrar_medicamento('Med05', 'Composto E', Laboratorios.laboratorios[4], 'Descrição do medicamento 5', 10.0)
+    
     MedicamentosFitoterapicos.cadastrar_med_fito('Med01', 'Composto A', Laboratorios.laboratorios[0], 'Descrição do medicamento 1', 10.0)
     MedicamentosFitoterapicos.cadastrar_med_fito('Med02', 'Composto B', Laboratorios.laboratorios[1], 'Descrição do medicamento 2', 15.0)
     MedicamentosFitoterapicos.cadastrar_med_fito('Med03', 'Composto c', Laboratorios.laboratorios[2], 'Descrição do medicamento 3', 10.0)
@@ -400,43 +496,42 @@ def main():
         if opcao == '1':
             Clientes.adicionar_cliente()
         elif opcao == '2':
-            Laboratorios.lista_labotarorios()
-            lab = input('\nEntre os laboratórios acima, informe o nome do Laboratório deste medicamento:')
             validacao_lab = True
             while validacao_lab:
-                for l in Laboratorios.lista_labotarorios:
-                    if l.nome == lab:
+                Laboratorios.lista_labotarorios()
+                lab = input('\nEntre os laboratórios acima, informe o nome do Laboratório deste medicamento:')
+                for laboratorio in Laboratorios.laboratorios:
+                    if laboratorio.nome == lab:
                         validacao_lab = False
-                        lab = l
-                    else:
-                        print('\nNome inválido, por favos, digite o nome exato do laboratório.')
-                        Laboratorios.lista_labotarorios()
-                        lab = input('\nEntre os laboratórios acima, informe o nome do Laboratório deste medicamento: ')
+                        lab = laboratorio
+                        
+                                   
+                #print('\nNome inválido, por favor, digite o nome exato do laboratório.') EMOVIDO DEVIDO AJUSTE NO WHILE
+                #Laboratorios.lista_labotarorios() REMOVIDO DEVIDO AJUSTE NO WHILE
+                #lab = input('\nEntre os laboratórios acima, informe o nome do Laboratório deste medicamento: ') REMOVIDO DEVIDO AJUSTE NO WHILE
             med_nome = input('\nInforme o nome medicamento: ')
             med_principal_composto = input('\nInforme o principal composto do medicamento: ')
-            med_descricao = input('\nInforme o principal composto do medicamento: ')
-            med_valor = input('\nInforme o valor de venda do medicamento: ')
-            med_receita = True if 's' in input('\nInforme o valor de venda do medicamento (S/N): ').lower() else False
+            med_descricao = input('\nInforme a descrição do medicamento: ')
+            med_valor = float(input('\nInforme o valor de venda do medicamento: '))
+            med_receita = True if 's' in input('\nO medicamento precisa de receita? (S/N): ').lower() else False
             
             MedicamentosQuimioterapicos.cadastrar_med_quimio(med_nome, med_principal_composto, lab, med_descricao, med_valor, med_receita)
 
         elif opcao == '3':
-            Laboratorios.lista_labotarorios()
-            lab = input('\nEntre os laboratórios acima, informe o nome do Laboratório deste medicamento:')
+                 
             validacao_lab = True
             while validacao_lab:
-                for l in Laboratorios.lista_labotarorios:
-                    if l.nome == lab:
+                Laboratorios.lista_labotarorios()
+                lab = input('\nEntre os laboratórios acima, informe o nome do Laboratório deste medicamento:')
+                for laboratorio in Laboratorios.laboratorios:
+                    if laboratorio.nome == lab:
                         validacao_lab = False
-                        lab = l
-                    else:
-                        print('\nNome inválido, por favos, digite o nome exato do laboratório.')
-                        Laboratorios.lista_labotarorios()
-                        lab = input('\nEntre os laboratórios acima, informe o nome do Laboratório deste medicamento: ')
-            med_nome = input('\nInforme o nome medicamento: ')
+                        lab = laboratorio
+                    
+            med_nome = input('\nInforme o nome do medicamento: ')
             med_principal_composto = input('\nInforme o principal composto do medicamento: ')
-            med_descricao = input('\nInforme o principal composto do medicamento: ')
-            med_valor = input('\nInforme o valor de venda do medicamento: ')
+            med_descricao = input('\nInforme a descrição do medicamento: ')
+            med_valor = float(input('\nInforme o valor de venda do medicamento: '))
             
             MedicamentosFitoterapicos.cadastrar_med_fito(med_nome, med_principal_composto, lab, med_descricao, med_valor)
 
@@ -449,11 +544,11 @@ def main():
                         loop_venda = True
                         validacao_cpf = False
                         break
-                    else:
-                       print(f'O CPF {c} não possui cadastro')
+                
+                print(f'O CPF {cpf_cliente} não possui cadastro')
 
             Carrinho.criar_carrinho() # INICIA CARRINHO PARA LIMPAR VARIAVEL DA VENDA ANTERIOR
-            print("aqui")
+            print("aqui") #REMOVER DEPOIS, SÓ PARA TESTE ISSO??
             Vendas.apresentar_catalogo()
             while loop_venda:
                 input_catalogo = str(input('\n Informe o nome do medicamento que deseja comprar, ou digite 0 para finalizar a venda:'))
