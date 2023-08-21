@@ -102,7 +102,7 @@ class Laboratorios():
             print(f'O laboratório {nome} foi cadastrado.')
 
     @classmethod
-    def lista_labotarorios(cls) -> None:
+    def lista_laboratorios(cls) -> None:
         for lab in cls.laboratorios:
             print(lab)
         return
@@ -466,9 +466,11 @@ def seed():
 
 
 def lista_todos_medicamentos() -> list:
-    lista = MedicamentosFitoterapicos.lista_fito
-    lista_quimio1 = MedicamentosQuimioterapicos.lista_quimio
-    lista.extend(lista_quimio1) 
+    lista = []
+    lista_fito = MedicamentosFitoterapicos.lista_fito
+    lista_quimio = MedicamentosQuimioterapicos.lista_quimio
+    lista.extend(lista_fito)
+    lista.extend(lista_quimio) 
     return lista
     
 def main():
@@ -498,7 +500,7 @@ def main():
         elif opcao == '2':
             validacao_lab = True
             while validacao_lab:
-                Laboratorios.lista_labotarorios()
+                Laboratorios.lista_laboratorios()
                 lab = input('\nEntre os laboratórios acima, informe o nome do Laboratório deste medicamento:')
                 for laboratorio in Laboratorios.laboratorios:
                     if laboratorio.nome == lab:
@@ -507,7 +509,7 @@ def main():
                         
                                    
                 #print('\nNome inválido, por favor, digite o nome exato do laboratório.') EMOVIDO DEVIDO AJUSTE NO WHILE
-                #Laboratorios.lista_labotarorios() REMOVIDO DEVIDO AJUSTE NO WHILE
+                #Laboratorios.lista_laboratorios() REMOVIDO DEVIDO AJUSTE NO WHILE
                 #lab = input('\nEntre os laboratórios acima, informe o nome do Laboratório deste medicamento: ') REMOVIDO DEVIDO AJUSTE NO WHILE
             med_nome = input('\nInforme o nome medicamento: ')
             med_principal_composto = input('\nInforme o principal composto do medicamento: ')
@@ -521,7 +523,7 @@ def main():
                  
             validacao_lab = True
             while validacao_lab:
-                Laboratorios.lista_labotarorios()
+                Laboratorios.lista_laboratorios()
                 lab = input('\nEntre os laboratórios acima, informe o nome do Laboratório deste medicamento:')
                 for laboratorio in Laboratorios.laboratorios:
                     if laboratorio.nome == lab:
