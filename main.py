@@ -386,7 +386,9 @@ class Vendas():
         total_sem_desconto =0
         desconto_final = 0
         cliente =Clientes.busca_cliente_cpf(cpf_cliente)
-        print("entrou no calcvalor =",cpf_cliente)
+        desconto_valor = 0.9 if total_sem_desconto > 150.00 else 1.0
+        desconto_idade = 0.8 if cliente.idade > 65 else 1.0
+        desconto_final = min(desconto_valor, desconto_idade)
         for item in lista_carrinho:
             quantidade = item[-1]
             valor_unitario = item[-2] 
@@ -395,9 +397,6 @@ class Vendas():
             item.append(total_sem_desconto)
             item.append(total_com_desconto)
             lista_pre_venda.extend(item)
-        desconto_valor = 0.9 if total_sem_desconto > 150.00 else 1.0
-        desconto_idade = 0.8 if cliente.idade > 65 else 1.0
-        desconto_final = min(desconto_valor, desconto_idade)
         
         return lista_pre_venda # [TIPO: srt, CPF: str, MEDICAMENTO: str, PRECO: float, QTD: int, VALOR_S_DESCONTO: float, VALOR_C_DESCONTO: float ]
     
@@ -417,25 +416,26 @@ class Vendas():
         medicamentos_valores = {}
 
         for item in cls.vendas_registradas:
-            tipo_medicamento = item[0]
-            nome_medicamento = item[2]
-            quantidade = item[4]
-            valor_com_desconto = item[6]
+            for i in range(0, len(item), 7):  
+                nome_medicamento = item[i + 2]
+                quantidade = item[i + 4]
+                valor = item[i + 6]
 
-            if nome_medicamento not in medicamentos_quantidades:
-                medicamentos_quantidades[nome_medicamento] = 0
-                medicamentos_valores[nome_medicamento] = 0.0
+                if nome_medicamento not in medicamentos_quantidades:
+                    medicamentos_quantidades[nome_medicamento] = 0
+                    medicamentos_valores[nome_medicamento] = 0.0
 
-            medicamentos_quantidades[nome_medicamento] += quantidade
-            medicamentos_valores[nome_medicamento] += valor_com_desconto
+                medicamentos_quantidades[nome_medicamento] += quantidade
+                medicamentos_valores[nome_medicamento] += valor
 
-        medicamento_mais_vendido = max(medicamentos_quantidades, key=medicamentos_quantidades.get)
-        quantidade_mais_vendida = medicamentos_quantidades[medicamento_mais_vendido]
-        valor_total_mais_vendido = medicamentos_valores[medicamento_mais_vendido]
-        
-        print(medicamento_mais_vendido,valor_total_mais_vendido,quantidade_mais_vendida)
-
-        return medicamento_mais_vendido, quantidade_mais_vendida, valor_total_mais_vendido
+            medicamento_mais_vendido = max(medicamentos_quantidades, key=medicamentos_quantidades.get)
+            quantidade_mais_vendida = medicamentos_quantidades[medicamento_mais_vendido]
+            valor_total_mais_vendido = medicamentos_valores[medicamento_mais_vendido]
+            
+            print(f"O medicamento mais vendido: {medicamento_mais_vendido}")
+            print(f"O Valor total: {valor_total_mais_vendido}")
+            print(f"A quantidade: {quantidade_mais_vendida}")
+            return medicamento_mais_vendido, quantidade_mais_vendida, valor_total_mais_vendido
 
     @classmethod
     def calcular(cls, tipo_medicamento):
@@ -443,21 +443,23 @@ class Vendas():
         valor_total_vendas = 0
 
         for venda in cls.vendas_registradas:
-            print(venda[0])
-            if venda[0].lower() == tipo_medicamento.lower():
-                quantidade_total_vendida += venda[4]  # A quantidade vendida está na quinta posição da lista
-                valor_total_vendas += venda[6]  # O valor com desconto está na sétima posição da lista
+            for i in range(0, len(venda), 7):
+                if venda[i].lower() == tipo_medicamento.lower():
+                    quantidade_total_vendida += venda[i+4] 
+                    print("quantidade",quantidade_total_vendida)
+                    valor_total_vendas += venda[i+5] 
+                    print("valor",valor_total_vendas)
 
-        print(f"Número de remédios {tipo_medicamento} vendidos no dia:")
+        print(f"Número de remédios {tipo_medicamento.lower()}terapicos vendidos no dia:")
         print(f"Quantidade total vendida: {quantidade_total_vendida}")
         print(f"Valor total das vendas: R${valor_total_vendas:.2f}")
 
     @classmethod
-    def calcular_e_apresentar_vendas_quimioterapicos(cls):
+    def vendas_quimioterapicos(cls):
         cls.calcular("QUIMIO")
 
     @classmethod
-    def calcular_e_apresentar_vendas_fitoterapicos(cls):
+    def vendas_fitoterapicos(cls):
         cls.calcular("FITO")
             
 def seed():
@@ -641,9 +643,9 @@ def main():
 # Remédio mais vendido, contendo a quantidade e o valor total
 # Número de remédios Quimioterápicos vendidos no dia, contendo a quantidade e o valor
 # Número de remédios Fitoterápicos vendidos no dia, contendo a quantidade e o valor
-            print(Vendas.med_mais_vendido())
-            print(Vendas.calcular_e_apresentar_vendas_fitoterapicos())
-            print(Vendas.calcular_e_apresentar_vendas_quimioterapicos())
+            Vendas.med_mais_vendido()
+            Vendas.vendas_fitoterapicos()
+            Vendas.vendas_quimioterapicos()
             break
         else:
             print("Opção inválida. Por favor, escolha uma opção válida.")
