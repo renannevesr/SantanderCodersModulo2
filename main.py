@@ -411,6 +411,18 @@ class Vendas():
     #     cls()
     #     return
     @classmethod
+    def contagem_clientes(cls):
+        clientes_atendidos = set() 
+
+        for item in cls.vendas_registradas:
+            for i in range(1, len(item), 7):  
+                cpf_cliente = item[i]
+                clientes_atendidos.add(cpf_cliente)
+
+        num_clientes = len(clientes_atendidos)
+        print(f"Número de clientes atendidos: {num_clientes}")
+        
+    @classmethod
     def med_mais_vendido(cls):
         medicamentos_quantidades = {}
         medicamentos_valores = {}
@@ -443,12 +455,12 @@ class Vendas():
         valor_total_vendas = 0
 
         for venda in cls.vendas_registradas:
+            valor_total_vendas = 0
             for i in range(0, len(venda), 7):
                 if venda[i].lower() == tipo_medicamento.lower():
-                    quantidade_total_vendida += venda[i+4] 
-                    print("quantidade",quantidade_total_vendida)
+                    quantidade_total_vendida += venda[i+4]    
                     valor_total_vendas += venda[i+5] 
-                    print("valor",valor_total_vendas)
+            
 
         print(f"Número de remédios {tipo_medicamento.lower()}terapicos vendidos no dia:")
         print(f"Quantidade total vendida: {quantidade_total_vendida}")
@@ -638,11 +650,7 @@ def main():
 
         elif opcao == '0':
             print("\nEstatísticas das vendas do dia:")
-            print("\nQuantidade de clientes atendido: ",len(Clientes.clientes))
-# Estatísticas dos atendimentos realizados no dia (considere o dia como o tempo que o menu está em execução. Quando for sair do programa, deve ser emitido este relatório) contendo:
-# Remédio mais vendido, contendo a quantidade e o valor total
-# Número de remédios Quimioterápicos vendidos no dia, contendo a quantidade e o valor
-# Número de remédios Fitoterápicos vendidos no dia, contendo a quantidade e o valor
+            Vendas.contagem_clientes()
             Vendas.med_mais_vendido()
             Vendas.vendas_fitoterapicos()
             Vendas.vendas_quimioterapicos()
